@@ -1,0 +1,14 @@
+syntax = "proto3";
+package ping;
+
+option optimize_for = SPEED;
+option go_package = "github.com/JosemyDuarte/ComponentManager/ping;ping";
+
+service PingService {
+  rpc Ping(PingRequest) returns (PingResponse) {}
+}
+
+message PingRequest {}
+message PingResponse {
+  string message = 1;
+}
