@@ -23,6 +23,12 @@ clean:
 	@echo "Cleaning generated files..."
 	@rm -f $(GO_OUT_DIR)/*.pb.go $(GO_OUT_DIR)/*.grpc.go
 
+
+# Install dependencies.
+.PHONY: deps
+deps:
+	go mod download
+
 # Run all the tests.
 .PHONY: test
 test:
