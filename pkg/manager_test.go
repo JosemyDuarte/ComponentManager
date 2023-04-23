@@ -1,4 +1,4 @@
-package internal_test
+package pkg_test
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/JosemyDuarte/ComponentManager/internal"
+	"github.com/JosemyDuarte/ComponentManager/pkg"
 )
 
 // Test the start and shutdown of the manager on a happy path
@@ -35,7 +35,7 @@ func TestComponentManager_StartAndShutdown(t *testing.T) {
 	}
 
 	// Create a new manager
-	m := internal.NewManager()
+	m := pkg.NewManager()
 
 	for _, fc := range fakeComponents {
 		m.Register(fc)
@@ -85,7 +85,7 @@ func TestComponentManager_StartTimeout(t *testing.T) {
 	}
 
 	// Create a new manager
-	m := internal.NewManager()
+	m := pkg.NewManager()
 
 	for _, fc := range fakeComponents {
 		m.Register(fc)
@@ -98,7 +98,7 @@ func TestComponentManager_StartTimeout(t *testing.T) {
 	select {
 	case err := <-errCh:
 		require.Error(t, err, "manager should have failed to start")
-		require.IsType(t, internal.ErrTimeout{}, err, "error should be a timeout error")
+		require.IsType(t, pkg.ErrTimeout{}, err, "error should be a timeout error")
 	default:
 		t.Fatal("manager should have failed to start")
 	}
@@ -125,7 +125,7 @@ func TestComponentManager_StartErr(t *testing.T) {
 	}
 
 	// Create a new manager
-	m := internal.NewManager()
+	m := pkg.NewManager()
 
 	for _, fc := range fakeComponents {
 		m.Register(fc)
@@ -153,7 +153,7 @@ func TestComponentManager_StartErr(t *testing.T) {
 // Test when a component returns an error after it has signaled that it has started
 func TestComponentManager_StartErrAfterStarted(t *testing.T) {
 	// Create a new manager
-	m := internal.NewManager()
+	m := pkg.NewManager()
 
 	m.Register(&fakeComponent{
 		name:          "health-check",
@@ -220,7 +220,7 @@ func TestComponentManager_ShutdownErr(t *testing.T) {
 	}
 
 	// Create a new manager
-	m := internal.NewManager()
+	m := pkg.NewManager()
 
 	for _, fc := range fakeComponents {
 		m.Register(fc)
@@ -268,7 +268,7 @@ func TestComponentManager_ShutdownGracePeriod(t *testing.T) {
 	}
 
 	// Create a new manager
-	m := internal.NewManager()
+	m := pkg.NewManager()
 
 	for _, fc := range fakeComponents {
 		m.Register(fc)
@@ -292,7 +292,7 @@ func TestComponentManager_ShutdownGracePeriod(t *testing.T) {
 	require.Error(t, err, "manager should have failed to shutdown")
 
 	// Check that the error is a timeout error
-	require.IsType(t, internal.ErrTimeout{}, err, "error should be a timeout error")
+	require.IsType(t, pkg.ErrTimeout{}, err, "error should be a timeout error")
 }
 
 // Define a fake component that takes some time to start and shutdown

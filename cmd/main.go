@@ -10,10 +10,11 @@ import (
 	"time"
 
 	"github.com/JosemyDuarte/ComponentManager/internal"
+	"github.com/JosemyDuarte/ComponentManager/pkg"
 )
 
 func main() {
-	manager := internal.NewManager()
+	manager := pkg.NewManager()
 
 	service := internal.NewService()
 	server := internal.NewServer(service, "127.0.0.1:")
