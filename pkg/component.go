@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Component is an interface that all components must implement
+// Component is an interface that all components must implement.
 type Component interface {
 	// Name returns the identifier of the component (mainly for logging purposes)
 	Name() string

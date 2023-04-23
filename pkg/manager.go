@@ -55,7 +55,8 @@ func (m *Manager) Start() chan error {
 		case <-initReady:
 			log.Printf("Component %s initialization completed\n", c.Name())
 		case <-time.After(c.StartTimeout()):
-			errCh <- ErrStartTimeout{ComponentName: c.Name()}
+			errCh <- StartTimeoutError{ComponentName: c.Name()}
+
 			return errCh
 		}
 
@@ -64,6 +65,7 @@ func (m *Manager) Start() chan error {
 		case err := <-errCh:
 			if err != nil {
 				errCh <- fmt.Errorf("failed to start component %s: %w", c.Name(), err)
+
 				return errCh
 			}
 		default:
@@ -72,6 +74,7 @@ func (m *Manager) Start() chan error {
 	}
 
 	log.Printf("All components started in %v", time.Since(start))
+
 	return errCh
 }
 
@@ -81,6 +84,7 @@ func (m *Manager) Start() chan error {
 // It won't continue to the next component until the previous one has finished its shutdown.
 func (m *Manager) Shutdown(ctx context.Context, gracePeriod time.Duration) error {
 	log.Printf("Shutting down %d components...\n", len(m.components))
+
 	start := time.Now()
 
 	var errs []error
@@ -108,14 +112,15 @@ func (m *Manager) Shutdown(ctx context.Context, gracePeriod time.Duration) error
 	case <-shutdownDone:
 		log.Printf("Shutdown finished in %v\n", time.Since(start))
 	case <-time.After(gracePeriod):
-		return ErrShutdownTimeout{TimeOut: gracePeriod}
+		return ShutdownTimeoutError{TimeOut: gracePeriod}
 	}
 
 	// Check if there were any errors during shutdown.
 	if len(errs) > 0 {
-		return fmt.Errorf("failed to shutdown %d components: %v", len(errs), errs)
+		return ShutdownError{Errors: errs}
 	}
 
 	log.Printf("Shutdown completed successfully\n")
+
 	return nil
 }
