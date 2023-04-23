@@ -55,7 +55,7 @@ func (m *Manager) Start() chan error {
 		case <-initReady:
 			log.Printf("Component %s initialization completed\n", c.Name())
 		case <-time.After(c.StartTimeout()):
-			errCh <- ErrTimeout{ComponentName: c.Name()}
+			errCh <- ErrStartTimeout{ComponentName: c.Name()}
 			return errCh
 		}
 
@@ -108,7 +108,7 @@ func (m *Manager) Shutdown(ctx context.Context, gracePeriod time.Duration) error
 	case <-shutdownDone:
 		log.Printf("Shutdown finished in %v\n", time.Since(start))
 	case <-time.After(gracePeriod):
-		return ErrTimeout{}
+		return ErrShutdownTimeout{TimeOut: gracePeriod}
 	}
 
 	// Check if there were any errors during shutdown.
