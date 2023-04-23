@@ -1,5 +1,11 @@
 # Makefile
 
+
+# Linter variables
+# Set linter version and binary location
+LINTER_VERSION := v1.52.2
+LINTER_BINARY := ./bin/golangci-lint
+
 # Set the variables.
 PROTO_DIR=./proto/ping
 PROTO_FILE=$(PROTO_DIR)/pong.proto
@@ -22,6 +28,8 @@ generate:
 clean:
 	@echo "Cleaning generated files..."
 	@rm -f $(GO_OUT_DIR)/*.pb.go $(GO_OUT_DIR)/*.grpc.go
+	@rm -rf bin
+	@echo "Done."
 
 
 # Install dependencies.
@@ -33,3 +41,14 @@ deps:
 .PHONY: test
 test:
 	go test -race -cover -timeout 5m -v ./...
+
+# Run linter
+.PHONY: lint
+lint: $(LINTER_BINARY)
+	$(LINTER_BINARY) run ./...
+
+# Install linter if necessary
+$(LINTER_BINARY):
+	@mkdir -p $(@D)
+	curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh \
+        | sh -s -- -b $(dir $@) $(LINTER_VERSION)
