@@ -27,8 +27,7 @@ clean:
 # Install dependencies.
 .PHONY: deps
 deps:
-	go mod tidy -v
-
+	go mod download
 
 # Run all the tests.
 .PHONY: test
