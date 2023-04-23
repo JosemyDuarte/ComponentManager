@@ -1,7 +1,7 @@
 package internal
 
 import (
-	context "context"
+	"context"
 	"errors"
 	"fmt"
 	"net"
@@ -12,13 +12,15 @@ import (
 	"github.com/JosemyDuarte/ComponentManager/proto/ping"
 )
 
+const serverStartTimeout = 5 * time.Second
+
 type Server struct {
 	port    string
 	server  *grpc.Server
 	service ping.UnsafePingServiceServer
 }
 
-// NewServer creates a new gRPC server with the given options and service
+// NewServer creates a new gRPC server with the given options and service.
 func NewServer(service ping.UnsafePingServiceServer, port string, opt ...grpc.ServerOption) *Server {
 	return &Server{
 		service: service,
@@ -55,5 +57,5 @@ func (s *Server) Shutdown(_ context.Context) error {
 }
 
 func (s *Server) StartTimeout() time.Duration {
-	return 5 * time.Second
+	return serverStartTimeout
 }

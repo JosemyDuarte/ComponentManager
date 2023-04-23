@@ -11,7 +11,7 @@ import (
 	"github.com/JosemyDuarte/ComponentManager/pkg"
 )
 
-// Test the start and shutdown of the manager on a happy path
+// Test the start and shutdown of the manager on a happy path.
 func TestComponentManager_StartAndShutdown(t *testing.T) {
 	fakeComponents := []*fakeComponent{
 		{
@@ -46,8 +46,7 @@ func TestComponentManager_StartAndShutdown(t *testing.T) {
 	select {
 	case err := <-errCh:
 		require.NoError(t, err, "failed to start the manager")
-	default:
-		// No error, continue
+	default: // No error, continue
 	}
 
 	// Check that all the components are started
@@ -64,7 +63,7 @@ func TestComponentManager_StartAndShutdown(t *testing.T) {
 	}
 }
 
-// Test scenario where a component fails to start due to a timeout
+// Test scenario where a component fails to start due to a timeout.
 func TestComponentManager_StartTimeout(t *testing.T) {
 	fakeComponents := []*fakeComponent{
 		{
@@ -98,7 +97,7 @@ func TestComponentManager_StartTimeout(t *testing.T) {
 	select {
 	case err := <-errCh:
 		require.Error(t, err, "manager should have failed to start")
-		require.IsType(t, pkg.ErrStartTimeout{}, err, "error should be a timeout error")
+		require.IsType(t, pkg.StartTimeoutError{}, err, "error should be a timeout error")
 	default:
 		t.Fatal("manager should have failed to start")
 	}
@@ -150,7 +149,7 @@ func TestComponentManager_StartErr(t *testing.T) {
 	}
 }
 
-// Test when a component returns an error after it has signaled that it has started
+// Test when a component returns an error after it has signaled that it has started.
 func TestComponentManager_StartErrAfterStarted(t *testing.T) {
 	// Create a new manager
 	m := pkg.NewManager()
@@ -180,8 +179,7 @@ func TestComponentManager_StartErrAfterStarted(t *testing.T) {
 	select {
 	case err := <-errCh:
 		require.NoError(t, err, "failed to start the manager")
-	default:
-		// No error, continue
+	default: // No error, continue
 	}
 
 	// Wait for components to fail after they signaled that they have started
@@ -233,8 +231,7 @@ func TestComponentManager_ShutdownErr(t *testing.T) {
 	select {
 	case err := <-errCh:
 		require.NoError(t, err, "manager should have started")
-	default:
-		// No error, continue
+	default: // No error, continue
 	}
 
 	// Shutdown the manager
@@ -281,8 +278,7 @@ func TestComponentManager_ShutdownGracePeriod(t *testing.T) {
 	select {
 	case err := <-errCh:
 		require.NoError(t, err, "manager should have started")
-	default:
-		// No error, continue
+	default: // No error, continue
 	}
 
 	// Shutdown the manager
@@ -292,10 +288,10 @@ func TestComponentManager_ShutdownGracePeriod(t *testing.T) {
 	require.Error(t, err, "manager should have failed to shutdown")
 
 	// Check that the error is a timeout error
-	require.IsType(t, pkg.ErrShutdownTimeout{}, err, "error should be a timeout error")
+	require.IsType(t, pkg.ShutdownTimeoutError{}, err, "error should be a timeout error")
 }
 
-// Define a fake component that takes some time to start and shutdown
+// Define a fake component that takes some time to start and shutdown.
 type fakeComponent struct {
 	name             string
 	startDuration    time.Duration
@@ -314,12 +310,15 @@ func (c *fakeComponent) Name() string {
 func (c *fakeComponent) Start(initReady chan struct{}) error {
 	// Simulate an initialization that takes some time
 	time.Sleep(c.startDuration)
+
 	if c.startError != nil {
 		return c.startError
 	}
 
 	c.isStarted = true
+
 	close(initReady)
+
 	return nil
 }
 
@@ -330,11 +329,13 @@ func (c *fakeComponent) IsStarted() bool {
 func (c *fakeComponent) Shutdown(_ context.Context) error {
 	// Simulate a shutdown that takes some time
 	time.Sleep(c.shutdownDuration)
+
 	if c.shutdownErr != nil {
 		return c.shutdownErr
 	}
 
 	c.isShutdown = true
+
 	return nil
 }
 
@@ -346,14 +347,16 @@ func (c *fakeComponent) StartTimeout() time.Duration {
 	return c.startTimeout
 }
 
-// Define a fake component that fails to start after it has signaled that it is ready
+// Define a fake component that fails to start after it has signaled that it is ready.
 type fakeComponentWithErrOnStart struct {
 	fakeComponent
 }
 
 func (c *fakeComponentWithErrOnStart) Start(initReady chan struct{}) error {
 	c.isStarted = true
+
 	close(initReady)
+
 	time.Sleep(c.startDuration)
 
 	return c.startError
