@@ -24,7 +24,7 @@ func (m *Manager) Register(component Component) {
 
 // Start starts all the components and returns an error channel.
 //
-// The error channel receives all the errors from the components, and it is the caller's responsibility
+// The returned error channel receives all the errors from the components, and it is the caller's responsibility
 // to check for errors. Since there can be errors happening even after the components have signaled that
 // they are ready.
 //
@@ -38,7 +38,7 @@ func (m *Manager) Start() chan error {
 
 	start := time.Now()
 
-	// Start all the components in parallel.
+	// Start all the components in order.
 	for _, c := range m.components {
 		log.Printf("Starting component %s...\n", c.Name())
 
